@@ -1,0 +1,31 @@
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "5555:6000"
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    restart: on-failure
+    command: >
+      sh -c "npm start"
+
+  db:
+    image: mongo
+    ports:
+      - "1234:27017"
+    env_file:
+      - .env.db
+    volumes:
+      - ./mongo_db:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+  web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./client:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
