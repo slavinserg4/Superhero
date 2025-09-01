@@ -1,0 +1,7 @@
+.SuperHeroes{
+    width: 1000px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 150px;
+    justify-content: center;
+}

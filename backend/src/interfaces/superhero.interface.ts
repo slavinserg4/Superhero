@@ -19,6 +19,6 @@ export type ICreateSuperhero = Pick<
     | "images"
 >;
 export interface ISuperheroQuery {
-    pageSize: number;
-    page: number;
+    pageSize?: number;
+    page?: number;
 }

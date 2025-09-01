@@ -17,6 +17,16 @@ class SuperheroRepository {
             Superhero.countDocuments(),
         ]);
     }
+    public async addSuperpower(
+        id: string,
+        superpower: string,
+    ): Promise<ISuperhero | null> {
+        return await (Superhero.findByIdAndUpdate(
+            id,
+            { $addToSet: { superpowers: superpower } },
+            { new: true },
+        ).lean() as Promise<ISuperhero | null>);
+    }
 
     public async create(dto: ICreateSuperhero): Promise<ISuperhero> {
         return (await Superhero.create(dto)).toObject() as ISuperhero;
@@ -33,20 +43,20 @@ class SuperheroRepository {
     ): Promise<ISuperhero | null> {
         const updateQuery: any = {};
 
-        // Перебираємо всі поля з dto
         Object.keys(dto).forEach((key) => {
             const value = dto[key as keyof ISuperhero];
-            // Якщо поле є масивом, використовуємо $addToSet
             if (Array.isArray(value)) {
-                updateQuery[key] = { $addToSet: { [key]: { $each: value } } };
+                updateQuery[key] = value;
             } else {
                 updateQuery[key] = value;
             }
         });
 
-        return await (Superhero.findByIdAndUpdate(id, updateQuery, {
-            new: true,
-        }).lean() as Promise<ISuperhero | null>);
+        return await (Superhero.findByIdAndUpdate(
+            id,
+            { $set: updateQuery },
+            { new: true },
+        ).lean() as Promise<ISuperhero | null>);
     }
 
     public async getById(id: string): Promise<ISuperhero | null> {

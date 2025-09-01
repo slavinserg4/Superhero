@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import { StatusCodesEnum } from "../enums/status-codes.enum";
+import { ApiError } from "../errors/api.error";
 import {
     ICreateSuperhero,
     ISuperhero,
@@ -49,7 +50,6 @@ class SuperheroController {
                     (file) => `/media/${file.filename}`,
                 );
 
-                // Додаємо кожне зображення
                 for (const imageUrl of imageUrls) {
                     updatedHero = await superheroService.addImage(id, imageUrl);
                 }
@@ -74,7 +74,7 @@ class SuperheroController {
             const { id } = req.params;
             const files = req.files as Express.Multer.File[];
 
-            const imageUrls = files.map((file) => `/media/${file.filename}`); // змінено з /uploads на /media
+            const imageUrls = files.map((file) => `/media/${file.filename}`);
 
             let superhero = await superheroService.getById(id);
 
@@ -92,6 +92,12 @@ class SuperheroController {
         try {
             const { id } = req.params;
             const { imageUrl } = req.body;
+            if (!imageUrl) {
+                throw new ApiError(
+                    "imageUrl is required",
+                    StatusCodesEnum.BED_REQUEST,
+                );
+            }
 
             const superhero = await superheroService.removeImage(id, imageUrl);
 

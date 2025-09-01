@@ -14,6 +14,12 @@ class SuperheroService {
     ): Promise<IPaginatedResponse<ISuperhero>> {
         const [data, totalItems] = await superheroRepository.getAll(query);
         const totalPages = Math.ceil(totalItems / query.pageSize);
+        if (!data) {
+            throw new ApiError(
+                "Superheroes not found",
+                StatusCodesEnum.NOT_FOUND,
+            );
+        }
         return {
             totalItems,
             totalPages,
@@ -38,7 +44,10 @@ class SuperheroService {
     public async getById(id: string): Promise<ISuperhero> {
         const hero = await superheroRepository.getById(id);
         if (!hero) {
-            throw new ApiError("Hero not found", StatusCodesEnum.NOT_FOUND);
+            throw new ApiError(
+                "Superhero not found",
+                StatusCodesEnum.NOT_FOUND,
+            );
         }
         return hero;
     }
@@ -50,6 +59,12 @@ class SuperheroService {
         imageUrl: string,
     ): Promise<ISuperhero> {
         return await superheroRepository.removeImage(id, imageUrl);
+    }
+    public async addSuperpower(
+        id: string,
+        superpower: string,
+    ): Promise<ISuperhero> {
+        return await superheroRepository.addSuperpower(id, superpower);
     }
 }
 export const superheroService = new SuperheroService();
